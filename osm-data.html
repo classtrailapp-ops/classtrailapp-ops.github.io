@@ -1,0 +1,88 @@
+<!doctype html>
+<!-- Not legal advice. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Classtrail open map data (OpenStreetMap)</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 16px/1.55 system-ui, sans-serif; max-width: 46rem; margin: 2rem auto; padding: 0 1rem; }
+  h1, h2 { line-height: 1.2; }
+  code { font-size: 0.95em; }
+</style>
+</head>
+<body>
+<h1>Classtrail open map data</h1>
+<p>Contains information from OpenStreetMap, which is made available here under the
+<a href="https://opendatacommons.org/licenses/odbl/1-0/">Open Database License (ODbL) 1.0</a>.
+&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>.</p>
+
+<p>The street map, the walking network, the bicycle network, the entrances, the places and the addresses of Classtrail are drawn and computed on the phone from data files
+that are derived from OpenStreetMap. This page offers those files to everyone, under the same licence, as the licence asks.</p>
+
+<h2>Download</h2>
+<ul>
+  <li><a href="data/campus-map-osm-data.zip">campus-map-osm-data.zip</a> (the data files and a README with the format of each file)</li>
+  <li><a href="data/README.txt">README.txt</a> (the same text as inside the zip)</li>
+</ul>
+
+<h2>The 3D map</h2>
+<p><code>map3d.pmtiles</code> is the archive of vector tiles (<a href="https://docs.protomaps.com/pmtiles/">PMTiles</a> version 3, Mapbox vector tiles, zoom 6 to 15) that the 3D map of the app draws:
+the ground (water, green, zones, roads, railways), every building with the height that OpenStreetMap gives (its <code>height</code> or <code>building:levels</code>, or a guess from its kind and size where there is none),
+the ribbons of glass that the app adds round tall towers, and the names of streets, places and buildings, for everything that the street maps of the app cover: the campuses, greater Stockholm and the ring round it.
+It is made from OpenStreetMap (and, for some footprints of the campuses, Overture Maps, under the same licence) by <code>tiles3d.py</code> with the tiler <code>tiler.py</code>; the README in the zip has the layers and the properties of each.
+What the app draws inside an opened building comes from KTH Places and is not part of this offer.</p>
+
+<h2>The buildings, the land use and the paths outside the campuses</h2>
+<p><code>vector_region_buildings.bin</code>, <code>vector_region_zones.bin</code> and <code>vector_region_paths.bin</code> are the buildings (with the courtyards of the big ones), the land use (housing, shops and offices, industry, school
+and hospital grounds, car parks, pitches, pedestrian areas, platforms, sand and rock, wetland, railway land) and the paths (service roads and tracks, footways, paths, cycleways and steps, as open lines) of the whole area that the street map of the app covers, outside the boxes of the campuses,
+whose own street maps (<code>vector_&lt;campus&gt;.json</code>) have them. They are binary files made from OpenStreetMap (the extract of BBBike and, for the two strips of the area that it does not cover, the extract of Sweden of Geofabrik cut to the frame by <code>cut_extract.py</code> and chosen by <code>strips.py</code>) by <code>build_region_buildings.py</code>, <code>build_region_zones.py</code> and <code>build_region_paths.py</code>
+(the land use with the classes of <code>add_map_zones.py</code>, the paths with the levels of <code>road_levels.py</code>); the README in the zip has the format (<code>region_pack.py</code>, which also holds a reader and a writer).</p>
+
+<h2>The words of the map</h2>
+<p><code>map_labels.bin</code> is the text of the street map of the app: the names of the streets (a label every 300 m of each named street), of the places (suburbs, neighbourhoods, villages, islands), of the lakes,
+bays and straits, of the parks, nature reserves and woods, of the stations and stops, of the shops, services and places of culture, education and health, and of the buildings that have a name, for the whole area that
+the street maps cover. Each label is a name as OpenStreetMap writes it (in the language of the place), a point, what it is, the zoom from which it is written and its priority. It is a binary file made from OpenStreetMap
+(the extract of BBBike; for the two strips of the area that it does not cover, the extract of Sweden of Geofabrik cut to the frame by <code>cut_extract.py</code> and chosen by <code>strips.py</code>; and, for the multipolygons that the extract of BBBike cannot assemble, the Overpass servers) by <code>build_map_labels.py</code> and
+<code>fetch_label_extras.py</code> with the rules of <code>map_labels_osm.py</code>; the README in the zip has the format (<code>map_labels_pack.py</code>, which also holds a reader and a writer).</p>
+
+<h2>The bicycle network</h2>
+<p><code>bike_graph.bin</code> is the network the app uses to work out routes by bike, e-bike and e-scooter: the cycle ways, paths, footways,
+service roads and streets of greater Stockholm and of the surroundings of S&ouml;dert&auml;lje and Haninge, as nodes and edges. Every edge says what kind of way it is
+(cycle way, shared path, street with a lane, quiet street, street, busy road, main road, or a stretch where the rider walks with the machine), its surface,
+whether it is one way for bicycles, and whether it is lit; some nodes are traffic lights, crossings or barriers. It is a binary file made from OpenStreetMap
+by <code>build_bike_graph.py</code> with the rules of <code>bike_classify.py</code>; the README in the zip has the format (<code>bike_graph_codec.py</code>, which also holds a reader and a writer)
+and the rules.</p>
+
+<h2>The places to park a bike</h2>
+<p><code>bike_parking.json</code> lists the places where a bike, an e-bike or an e-scooter can be left near the campuses (bicycle parking and the charging stations
+for bikes of OpenStreetMap): the position, whether there is a roof, lockers or a charger, how many bikes fit, whether it is paid and whether it is for everybody.
+It was made by <code>build_bike_parking.py</code>, whose first lines describe the format; the places marked private in OpenStreetMap are only listed by their
+identifier, so that the app does not send anybody there.</p>
+
+<h2>The names of the buildings</h2>
+<p><code>building_labels_osm.json</code> holds the names that OpenStreetMap gives to buildings and the street addresses (from the address points of OpenStreetMap) that label the others:
+text, position, rank (1 an OpenStreetMap name, 2 an address, 3 the nearest address), area and kind. It is the part of the file <code>building_labels.json</code> of the app that comes from
+OpenStreetMap; the 50 names that the app takes from KTH Places for its own buildings are not part of it and are not offered under this licence. It was made by <code>build_building_labels.py</code>,
+whose first lines describe the format.</p>
+
+<h2>The relief of the 3D map (not OpenStreetMap)</h2>
+<p>The shading of the hills that the 3D map draws at the zoom of the region comes from a different source: the Copernicus DEM GLO-30 (a digital surface model of about 30 m), cut into tiles by <code>relief.py</code> into its own file,
+<code>map3d_terrain.pmtiles</code>. It is <strong>not</strong> made from OpenStreetMap, it is not under the ODbL and it is not part of the files offered on this page. Credit: Produced using Copernicus WorldDEM-30 &copy; DLR e.V. 2010-2014 and
+&copy; Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved.</p>
+
+<h2>What you may do</h2>
+<p>Copy, distribute and adapt these files under the ODbL: credit OpenStreetMap, say so if you changed them, and offer what you publish from them
+under the same licence. Some buildings were added from <a href="https://overturemaps.org">Overture Maps</a>, which is also under the ODbL; its
+contributors include Esri Community Maps contributors (CC BY 4.0), Microsoft (ODbL) and Google (CC BY 4.0).</p>
+
+<h2>What is not included</h2>
+<p>The rooms, the floor plans and the names taken from KTH Places belong to KTH and are not part of this offer. In the files of gyms and scooter parking
+the field <code>sources</code> names where each kind of entry comes from: only the OpenStreetMap part is offered under the ODbL, the other sources keep their own terms.</p>
+
+<p>Classtrail is an independent app: it is not affiliated with, endorsed by or sponsored by KTH Royal Institute of Technology or SL.
+Contact: <a href="mailto:classtrail.app@gmail.com">classtrail.app@gmail.com</a>.</p>
+<p><a href="index.html">Back</a></p>
+</body>
+</html>
