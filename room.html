@@ -1,0 +1,64 @@
+<!doctype html>
+<!-- The page that the link of a shared room opens (lib/services/room_link.dart). Static: no server, no cookies, no analytics, no request to any other site.
+     It reads the room from the address of the page (?id=..&n=..&b=..&f=..), shows it as plain text, and offers the app: a button that opens it, and the stores. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Classtrail room</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 18px/1.5 system-ui, sans-serif; max-width: 34rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  h1 { font-size: 1.6rem; line-height: 1.2; margin: .2rem 0 .3rem; overflow-wrap: anywhere; }
+  .place { margin: 0 0 1.2rem; opacity: .85; overflow-wrap: anywhere; }
+  .btn { display: inline-block; box-sizing: border-box; min-height: 48px; padding: .7rem 1.1rem; margin: .3rem .4rem .3rem 0; border-radius: 999px;
+         border: 2px solid currentColor; font-weight: 600; text-decoration: none; }
+  .primary { background: #1a5fb4; border-color: #1a5fb4; color: #fff; }
+  .small { font-size: .9rem; opacity: .8; margin-top: 1.5rem; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<p><strong>Classtrail</strong></p>
+<h1 id="name">A room in Classtrail</h1>
+<p class="place" id="place"></p>
+
+<p id="open-box" hidden>
+  <a class="btn primary" id="open" href="#">Open in the app</a>
+</p>
+<p id="stores-title"><strong>Do not have the app yet?</strong></p>
+<p id="stores">
+  <a class="btn" id="play" href="https://play.google.com/store/apps/details?id=app.classtrail.guide">Google Play</a>
+  <a class="btn" id="apple" href="#" hidden>App Store</a>
+</p>
+<noscript><p>This page shows the name of the room with the help of a small script. Without it, open the link in the app.</p></noscript>
+<p class="small">Classtrail is a campus map and timetable for the students of Stockholm. This page stores nothing and sends nothing about you.
+  <a href="privacy.html">Privacy</a></p>
+<script>
+(function () {
+  // STORE LINKS: the address of the app in the App Store is filled in when the app is published (docs/ENLACES_PROFUNDOS.md); until then the button stays hidden.
+  var APPLE_URL = '';
+  var q = new URLSearchParams(location.search);
+  var id = q.get('id') || '';
+  // an id is letters, digits and dashes (a UUID); anything else is ignored and the page shows no room
+  var okId = /^[A-Za-z0-9-]{8,64}$/.test(id);
+  function clip(s, n) { s = (s || '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim(); return s.length > n ? s.slice(0, n) : s; }
+  var name = clip(q.get('n'), 80);
+  var place = [clip(q.get('b'), 80), clip(q.get('f'), 20) ? 'floor ' + clip(q.get('f'), 20) : ''].filter(Boolean).join(' · ');
+  if (okId && name) document.getElementById('name').textContent = name;
+  if (okId && place) document.getElementById('place').textContent = place;
+  if (okId) {
+    var open = document.getElementById('open');
+    open.href = 'classtrail:///room?id=' + encodeURIComponent(id);
+    document.getElementById('open-box').hidden = false;
+    // on Android the phone may open the app by itself; on an iPhone the person taps the button (a page may not jump to an app without a tap)
+    if (/Android/i.test(navigator.userAgent)) { setTimeout(function () { location.href = open.href; }, 400); }
+  }
+  if (APPLE_URL) { var a = document.getElementById('apple'); a.href = APPLE_URL; a.hidden = false; }
+  document.title = (okId && name ? name + ' · ' : '') + 'Classtrail';
+})();
+</script>
+</body>
+</html>

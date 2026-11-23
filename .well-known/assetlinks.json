@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.classtrail.guide",
+      "sha256_cert_fingerprints": [
+        "69:DE:DF:A3:FA:06:6F:2B:93:B6:C1:F5:14:A6:E2:F4:20:18:75:A6:E4:05:6C:58:AA:B6:2A:6D:33:C0:25:95",
+        "37:3C:80:10:CC:B3:55:E7:A4:0F:DE:14:68:BE:35:F9:95:EE:AB:C5:03:58:E0:92:F0:67:1C:33:46:87:B9:1D"
+      ]
+    }
+  }
+]
