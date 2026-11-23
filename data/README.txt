@@ -28,7 +28,7 @@ FILES
 -----
 vector_map.json: Street map of the main campus: buildings, roads, water, green
 vector_region.json: Coarse street map of greater Stockholm around the main campus: water, green, streets, roads in tunnels and on bridges, railways, waterways, piers, ferry routes and runways
-vector_outer.json: Coarser street map of the ring around greater Stockholm, so that every campus has map all around it (as the region file, with every street of the towns of the ring)
+vector_outer.json: Coarser street map of the ring around greater Stockholm, so that every campus has map all around it (as the region file, with every street of the towns of the ring; the lakes, bays and woods that the extract of BBBike cannot assemble because its edge cuts a member of their multipolygon, such as Malaren, are read whole from the extract of Sweden)
 vector_flemingsberg.json: Street map of the Flemingsberg campus
 vector_ersta.json: Street map of the Ersta campus
 vector_frescati.json: Street map of the Frescati campus
@@ -50,7 +50,7 @@ institution_places.json: Buildings of institutions that OpenStreetMap draws and 
 bike_parking.json: Places to leave a bike, an e-bike or an e-scooter near the campuses, with what OpenStreetMap says about each one (roof, lockers, how many bikes, a charger for e-bikes, a fee, who may use it)
 map3d.pmtiles: The 3D map: ONE archive of vector tiles (PMTiles v3, zoom 6 to 15) of the ground (with the trees and the decks of the bridges: map3d/build_extras.py makes them from the same extract), the buildings with their heights, the ribbons of glass of tall towers and the names of the streets, places, waters, parks, stations and buildings of everything that the street maps cover (the campuses, greater Stockholm and the ring round it)
 vector_region_buildings.bin: Buildings of the whole area of the street maps outside the boxes of the campuses (OpenStreetMap buildings, with the courtyards of the big ones; binary, whole numbers of 1/2^27 of the width of the world)
-vector_region_zones.bin: Land use of the whole area of the street maps outside the boxes of the campuses: housing, shops and offices, industry, school and hospital grounds, car parks, pitches, pedestrian areas, platforms, sand and rock, wetland, railway land, farmland, allotments, golf courses, quarries and landfill, the airfield, heath and orchards (OpenStreetMap areas; binary, whole numbers of 1/2^26 of the width of the world)
+vector_region_zones.bin: Land use of the whole area of the street maps outside the boxes of the campuses: housing, shops and offices, industry, school and hospital grounds, car parks, pitches, pedestrian areas, platforms, sand and rock, wetland, railway land, farmland, allotments, golf courses, quarries and landfill, the airfield, heath and orchards (OpenStreetMap areas, the ones that the extract of BBBike cannot assemble read whole from the extract of Sweden; binary, whole numbers of 1/2^26 of the width of the world)
 vector_region_paths.bin: Paths of the whole area of the street maps outside the boxes of the campuses: service roads and tracks, footways, paths, cycleways and bridleways, and steps, as open lines with their class and level (on the surface, on a bridge, in a tunnel) (OpenStreetMap highway ways; binary, whole numbers of 1/2^26 of the width of the world)
 map_labels.bin: The words of the 2D map: the names of streets (a label every 300 m of each named street), places (suburbs, islands, villages), lakes and bays, parks and nature reserves, stations, shops and services and buildings of the whole area of the street maps, each with its class, the zoom from which it is written, its priority and its place (OpenStreetMap names, in the language of the place; binary, whole numbers of 1/2^23 of the width of the world)
 bike_graph.bin: Bicycle network of greater Stockholm, Sodertalje and Haninge: cycle ways, paths, streets and what a rider can do on them, as nodes and edges (binary)
@@ -153,7 +153,8 @@ Writes assets/data/vector_outer.json, in the format of vector_region.json (see b
 except the region (vector_region.json draws that) and the detailed map of every campus outside the region (their own files draw
 them). Around those campuses (MID_METERS) and in a band of 3 km round the region it is as fine as the region; further out it is coarser: where the extract of BBBike is
 (tools/fetch_region_pbf.py: 17.535 to 18.557 E, 59.103 to 59.571 N) it has every street and every pond and park of 200 and 1,000 m2, with the geometry simplified to 8 to 10 m; in the two strips of the
-frame outside the extract it is the same from the second extract (the frame cut out of the extract of Sweden: tools/strips.py, tools/cut_extract.py), and as coarse as it was, with the main roads, the railways,
+frame outside the extract it is the same from the second extract (the frame cut out of the extract of Sweden: tools/strips.py, tools/cut_extract.py), and so are the lakes, bays and woods that the extract of BBBike
+cannot assemble because its edge cuts a member of their multipolygon (Malaren: strips.edge_areas), over the whole far ring; and as coarse as it was, with the main roads, the railways,
 and the water and green areas that are big enough to be seen on a map of the whole area, when that file is not there. The railways of the file are kept as they are
 (--from-scratch builds them from the raw answers). The roads in a tunnel and on a bridge have their own keys, as in the region file.  (c) OpenStreetMap contributors, ODbL.
 
@@ -169,6 +170,8 @@ Every builder that reads the extract reads two files now, each over its own part
 
   primary   the extract of BBBike, over the part of the frame that it covers, 300 m in from its edge (an area that the extract cuts at its edge is not used: tools/build_vector_outer.py COVER)
   strips    the second extract, over the rest of the frame: the two strips and the 300 m inside the edge of the first, which is where the multipolygons that BBBike cuts are whole
+  edge areas  the areas that BBBike cannot assemble at all (a multipolygon with a member outside its box: Malaren, the bays, the big woods, the farmland that its edge cuts: `edge_areas`): the second extract, over the
+            whole frame, and not read again in the strips; an area is read from ONE extract only, by its id, so that nothing is drawn twice
 
 Without the second file a builder reads the first over the whole frame as it always did, and says so: its asset has no strips then, and `--check` of one that has them says that it cannot check.
 The windows are polygons of metres (x = longitude * KX, y = latitude * KY: tools/region_geom.py). Map data (c) OpenStreetMap contributors, ODbL.
